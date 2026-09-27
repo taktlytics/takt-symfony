@@ -1,5 +1,18 @@
 # vskstudio/takt-symfony
 
+## 0.6.0
+
+### Minor Changes
+
+- Route redaction. `redact_routes` lists sensitive routes sent as their pattern
+  instead of the real path (`/verify/abc` becomes `/verify/{token}`), and
+  `route_templates` sends every page as its Symfony route path, resolved from
+  the `_route` of the main request through the router. Both apply to the
+  `takt()` snippet, where they require `mode: sdk`, and to the autowired `Takt`
+  service: the current route path becomes the default `route` of `pageview()`
+  and `event()`, which also accept an explicit `route`.
+- Requires `vskstudio/takt-core-php` 0.6.
+
 ## 0.5.1
 
 ### Patch Changes

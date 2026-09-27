@@ -50,6 +50,8 @@ takt:
   respect_dnt: null     # false stops honoring the Do-Not-Track header
   enabled: null         # false disables tracking entirely (kill-switch)
   scrub_url: null       # raw JS fn to rewrite URLs; requires mode: sdk (dev-controlled only)
+  redact_routes: []     # sensitive routes sent as their pattern, e.g. ['/verify/{token}']
+  route_templates: false # send every page as its route path, e.g. /users/{id}
 ```
 
 The `api_key` must be **ingest-scoped and domain-bound**. Keep it out of source
@@ -104,7 +106,7 @@ Call the `takt()` Twig function inside the `<head>` of your base template:
 - `cdn` — a `<script>` tag pointing at jsDelivr (`@vskstudio/takt-core`) is rendered.
 - `asset` — a `<script>` tag pointing at `/takt/takt.auto.js`, served by your own
   application (prefixed with `script_origin` when set).
-- `sdk` — a `<script type="module">` boots the full SDK via `init()`; required for `scrub_url`.
+- `sdk` — a `<script type="module">` boots the full SDK via `init()`; required for `scrub_url`, `exclude`, `redact_routes` and `route_templates`.
 
 ## Server-side events
 
@@ -136,6 +138,50 @@ attributes events to the request's IP address and User-Agent. It is deliberately
 attribution never outlives the request, including under long-running runtimes
 (FrankenPHP worker mode, RoadRunner).
 
+## Route redaction
+
+Query strings are stripped by default, but path segments are sent as they are:
+`/verify/abc123` leaks the token. Two opt-in settings replace real paths with
+route templates, in the snippet and in server-side events alike. In the snippet
+both require `mode: sdk`: the minimal snippet of the other modes cannot honor
+them, so the `SnippetRenderer` throws.
+
+```yaml
+takt:
+  mode: 'sdk'
+  redact_routes: ['/verify/{token}', '/reset/{code}']
+```
+
+`redact_routes` lists the sensitive routes. A matching path is sent as the
+pattern, every other path keeps its real value. Patterns accept the Symfony
+syntax (`{token}`, `{page?}`) as well as `[param]`, `[[optional]]`,
+`[...rest]`, `:param`, `*` and `**`. The browser SDK reads `{token}` as
+`[token]`, so a browser pageview reports `/verify/[token]` where a server event
+reports `/verify/{token}`; write `/verify/[token]` if both must land on the same
+row.
+
+```yaml
+takt:
+  mode: 'sdk'
+  route_templates: true
+```
+
+`route_templates` sends every page as its route path: `/users/42` becomes
+`/users/{id}`. The bundle resolves the `_route` of the main request through the
+router (`Route::getPath()`, inline requirements and defaults stripped), renders
+it into the `takt()` snippet and uses it as the default `route` of every
+`pageview()` and `event()` sent by the autowired `Takt` service. It suits fully
+private apps; on a public site it merges every article into one row. A request
+with no matched route keeps its real path, still subject to `redact_routes`.
+Resolving a route path loads the router's route collection, so this mode costs a
+little on each request.
+
+Any server-side call can pick its own route template:
+
+```php
+$this->takt->event('Verified', url: $request->getUri(), route: '/verify/{token}');
+```
+
 ## Registered services
 
 | Service                          | Visibility        | Notes                                                              |
@@ -144,6 +190,7 @@ attribution never outlives the request, including under long-running runtimes
 | `Vskstudio\Takt\SnippetRenderer` | public, shared     | Renders the snippet; backs the `takt()` Twig function.              |
 | `Vskstudio\Takt\Options`         | private, shared    | Built from the bundle config, injected into the renderer.           |
 | `…\Twig\TaktTwigExtension`       | public, shared     | Tagged `twig.extension`, exposes the `takt()` function (HTML-safe). |
+| `…\Symfony\RouteTemplate`        | private, shared    | Registered only with `route_templates: true`; resolves the current route path. |
 
 > **Behind a proxy or load balancer?** The attributed IP comes from
 > `Request::getClientIp()`. It only honours `X-Forwarded-For` when the request
