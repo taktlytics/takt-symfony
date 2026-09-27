@@ -7,12 +7,16 @@ use Vskstudio\Takt\Takt;
 
 final class TaktFactory
 {
-    public static function create(string $endpoint, string $domain, ?string $apiKey, RequestStack $stack): Takt
+    /** @param list<string> $redactRoutes */
+    public static function create(string $endpoint, string $domain, ?string $apiKey, RequestStack $stack, array $redactRoutes = [], ?RouteTemplate $routeTemplate = null): Takt
     {
-        $takt = new Takt(Endpoint::origin($endpoint), $domain, $apiKey);
+        $takt = new Takt(Endpoint::origin($endpoint), $domain, $apiKey, redactRoutes: $redactRoutes);
         $request = $stack->getCurrentRequest();
         if ($request !== null) {
             $takt = $takt->withVisitor($request->getClientIp(), $request->headers->get('User-Agent'));
+        }
+        if ($routeTemplate !== null) {
+            $takt = $takt->withRoute($routeTemplate->current(...));
         }
 
         return $takt;
