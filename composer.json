@@ -11,15 +11,15 @@
         "tracking",
         "twig"
     ],
-    "homepage": "https://github.com/vskstudio/takt-symfony",
+    "homepage": "https://github.com/taktlytics/takt-symfony",
     "authors": [
         {
             "name": "vskstudio"
         }
     ],
     "support": {
-        "issues": "https://github.com/vskstudio/takt-symfony/issues",
-        "source": "https://github.com/vskstudio/takt-symfony"
+        "issues": "https://github.com/taktlytics/takt-symfony/issues",
+        "source": "https://github.com/taktlytics/takt-symfony"
     },
     "require": {
         "php": ">=8.1",
