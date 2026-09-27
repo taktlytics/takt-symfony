@@ -106,7 +106,7 @@ Call the `takt()` Twig function inside the `<head>` of your base template:
 - `cdn` — a `<script>` tag pointing at jsDelivr (`@vskstudio/takt-core`) is rendered.
 - `asset` — a `<script>` tag pointing at `/takt/takt.auto.js`, served by your own
   application (prefixed with `script_origin` when set).
-- `sdk` — a `<script type="module">` boots the full SDK via `init()`; required for `scrub_url`, `exclude`, `redact_routes` and `route_templates`.
+- `sdk`: a `<script type="module">` boots the full SDK via `init()`; required for `scrub_url`, `exclude`, `redact_routes` and `route_templates`.
 
 ## Server-side events
 
