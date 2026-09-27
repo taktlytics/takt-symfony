@@ -5,11 +5,14 @@ namespace Vskstudio\Takt\Symfony\Twig;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 use Vskstudio\Takt\SnippetRenderer;
+use Vskstudio\Takt\Symfony\RouteTemplate;
 
 final class TaktTwigExtension extends AbstractExtension
 {
-    public function __construct(private readonly SnippetRenderer $renderer)
-    {
+    public function __construct(
+        private readonly SnippetRenderer $renderer,
+        private readonly ?RouteTemplate $routeTemplate = null,
+    ) {
     }
 
     public function getFunctions(): array
@@ -19,6 +22,8 @@ final class TaktTwigExtension extends AbstractExtension
 
     public function render(): string
     {
-        return $this->renderer->render();
+        $template = $this->routeTemplate?->current();
+
+        return ($template === null ? $this->renderer : $this->renderer->withRouteTemplate($template))->render();
     }
 }
