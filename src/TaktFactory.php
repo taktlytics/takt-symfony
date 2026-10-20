@@ -8,9 +8,9 @@ use Vskstudio\Takt\Takt;
 final class TaktFactory
 {
     /** @param list<string> $redactRoutes */
-    public static function create(string $endpoint, string $domain, ?string $apiKey, RequestStack $stack, array $redactRoutes = [], ?RouteTemplate $routeTemplate = null): Takt
+    public static function create(string $endpoint, string $domain, ?string $apiKey, RequestStack $stack, array $redactRoutes = [], ?RouteTemplate $routeTemplate = null, bool $redactUndecodablePaths = true): Takt
     {
-        $takt = new Takt(Endpoint::origin($endpoint), $domain, $apiKey, redactRoutes: $redactRoutes);
+        $takt = new Takt(Endpoint::origin($endpoint), $domain, $apiKey, redactRoutes: $redactRoutes, redactUndecodablePaths: $redactUndecodablePaths);
         $request = $stack->getCurrentRequest();
         if ($request !== null) {
             $takt = $takt->withVisitor($request->getClientIp(), $request->headers->get('User-Agent'));

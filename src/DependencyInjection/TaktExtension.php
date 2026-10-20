@@ -70,6 +70,7 @@ final class TaktExtension extends Extension
             new Reference('request_stack'),
             $config['redact_routes'],
             $routeTemplate,
+            $config['redact_undecodable_paths'],
         ]);
         $taktDef->setPublic(true);
         // Non partagé : l'instance capte l'IP/User-Agent de la requête courante,

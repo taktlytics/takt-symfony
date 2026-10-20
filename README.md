@@ -52,6 +52,7 @@ takt:
   scrub_url: null       # raw JS fn to rewrite URLs; requires mode: sdk (dev-controlled only)
   redact_routes: []     # sensitive routes sent as their pattern, e.g. ['/verify/{token}']
   route_templates: false # send every page as its route path, e.g. /users/{id}
+  redact_undecodable_paths: true # server-side events: false matches a malformed path like any other
 ```
 
 The `api_key` must be **ingest-scoped and domain-bound**. Keep it out of source
@@ -155,10 +156,33 @@ takt:
 `redact_routes` lists the sensitive routes. A matching path is sent as the
 pattern, every other path keeps its real value. Patterns accept the Symfony
 syntax (`{token}`, `{page?}`) as well as `[param]`, `[[optional]]`,
-`[...rest]`, `:param`, `*` and `**`. The browser SDK reads `{token}` as
-`[token]`, so a browser pageview reports `/verify/[token]` where a server event
-reports `/verify/{token}`; write `/verify/[token]` if both must land on the same
-row.
+`[...rest]`, `:param`, `:param?`, `*`, `**`, `*name`, `:name*` and `:name+`. The
+browser SDK reads `{token}` as `[token]`, so a browser pageview reports
+`/verify/[token]` where a server event reports `/verify/{token}`; write
+`/verify/[token]` if both must land on the same row.
+
+A parameter can carry a regex constraint, `{id<\d+>}`, which must match the whole
+segment (case-insensitively). The regex follows a restricted grammar, the same in
+the PHP and JavaScript SDKs: alternation only at the top level, literals, `.`,
+`\d \D \w \W \s \S`, escaped ASCII punctuation, classes `[...]` without
+nesting, and quantifiers bounded to 100. Groups, lookarounds, backreferences,
+anchors and `/` are refused, and the grammar counts bytes, not characters. A
+constrained parameter keeps its brace form in the browser, so the browser needs
+an SDK that reads that form to enforce the constraint. A route is unusable when
+one of its constraints is refused, when its constraints hold more than two
+variable quantifiers in total, when one segment holds more than one constrained
+parameter or more than two variable quantifiers, when its ambiguity degree
+exceeds one (`/{a}{b}/{c}{d}` is refused, `/{a}{b}/{c}` is accepted), or when it
+holds more than one REST segment (`**`, `*name`, `:name*`, `:name+` or
+`[...name]`). An unusable route masks, as `/[redacted]`, every path with the same
+shape; other paths are unaffected.
+
+A path that cannot be decoded (a malformed escape such as `%ZZ`, or invalid UTF-8
+once decoded) is masked as `/[redacted]` while a route is configured. Set
+`redact_undecodable_paths: false` to match such a path like any other on
+server-side events: it is then sent as the template it matches, and raw only when
+no route matches. The browser snippet keeps masking it, since the browser SDK has
+no such option.
 
 ```yaml
 takt:
