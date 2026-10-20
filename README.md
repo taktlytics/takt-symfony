@@ -1,7 +1,7 @@
 # takt-symfony
 
 
-> 📚 **Documentation** — [taktlytics.com/docs/wrappers/symfony](https://taktlytics.com/docs/wrappers/symfony)
+> 📚 **Documentation**: [taktlytics.com/docs/wrappers/symfony](https://taktlytics.com/docs/wrappers/symfony)
 
 Symfony bundle for [Takt](https://github.com/vskstudio) analytics. It wires the
 Takt snippet into your templates through a `{{ takt() }}` Twig function and
@@ -42,7 +42,7 @@ takt:
   not_found: false      # track 404 pageviews
   exclude_localhost: true
   nonce: null           # CSP nonce for the inline <script> (request-scoped)
-  # Advanced options — null keeps the tracker defaults.
+  # Advanced options: null keeps the tracker defaults.
   sample_rate: null     # e.g. 0.5 keeps ~50% of hits
   track_query: null     # true keeps the raw query string + hash in URLs
   query_params: []      # params to keep when track_query is off, e.g. ['utm_source']
@@ -58,12 +58,12 @@ The `api_key` must be **ingest-scoped and domain-bound**. Keep it out of source
 control via an environment variable.
 
 `script_origin` is the first-party origin to serve the tracker + derive the
-endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain you
+endpoint from (`{origin}/api/event`): your Takt domain or a custom domain you
 proxy through to dodge ad-blockers (`endpoint` wins over it).
 
-`endpoint` is where events are collected. It feeds two code paths at once — the
+`endpoint` is where events are collected. It feeds two code paths at once: the
 browser snippet, which needs the full collect URL, and the server-side sender,
-which needs the origin it appends `/api/event` to — so both forms are accepted
+which needs the origin it appends `/api/event` to. So both forms are accepted
 and normalised for you. These two settings are equivalent:
 
 ```yaml
@@ -86,7 +86,7 @@ The advanced options map to the engine's `sampleRate`, `trackQuery`,
 `queryParams`, `respectDnt` and `enabled`. `exclude` maps to the engine's
 `exclude` (path prefixes never tracked) and, like `scrub_url`, only works in
 `mode: sdk`. `scrub_url` is a **raw JS function** injected verbatim, so it only
-works in `mode: sdk` (a full ES-module `init()` render) — keep it dev-controlled
+works in `mode: sdk` (a full ES-module `init()` render). Keep it dev-controlled
 and never build it from user input.
 
 ## Client-side tracking
@@ -102,9 +102,9 @@ Call the `takt()` Twig function inside the `<head>` of your base template:
 
 ### Modes
 
-- `inline` — the tracking script is embedded directly in the page.
-- `cdn` — a `<script>` tag pointing at jsDelivr (`@vskstudio/takt-core`) is rendered.
-- `asset` — a `<script>` tag pointing at `/takt/takt.auto.js`, served by your own
+- `inline`: the tracking script is embedded directly in the page.
+- `cdn`: a `<script>` tag pointing at jsDelivr (`@vskstudio/takt-core`) is rendered.
+- `asset`: a `<script>` tag pointing at `/takt/takt.auto.js`, served by your own
   application (prefixed with `script_origin` when set).
 - `sdk`: a `<script type="module">` boots the full SDK via `init()`; required for `scrub_url`, `exclude`, `redact_routes` and `route_templates`.
 
@@ -134,7 +134,7 @@ final class CheckoutController
 
 The autowired service is bound to the current request: it automatically
 attributes events to the request's IP address and User-Agent. It is deliberately
-**not** a shared service — a fresh instance is built on each injection so the
+**not** a shared service. A fresh instance is built on each injection so the
 attribution never outlives the request, including under long-running runtimes
 (FrankenPHP worker mode, RoadRunner).
 
@@ -196,8 +196,8 @@ $this->takt->event('Verified', url: $request->getUri(), route: '/verify/{token}'
 > `Request::getClientIp()`. It only honours `X-Forwarded-For` when the request
 > is trusted, so configure [`framework.trusted_proxies`](https://symfony.com/doc/current/deployment/proxies.html)
 > for the real client IP. Without trusted proxies, clients can spoof the
-> forwarded header — so never treat the attributed IP as authoritative.
+> forwarded header. So never treat the attributed IP as authoritative.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT: see [LICENSE](LICENSE).
