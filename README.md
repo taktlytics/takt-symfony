@@ -79,6 +79,12 @@ to talk to the hosted Takt service. Takt is a managed service hosted in Europe;
 only the `/takt.js` measurement script can be served from your own domain (see
 `mode: asset` and `script_origin`).
 
+`takt-core-php` 0.7 refuses every endpoint that is not `https`, `localhost` included, so the
+endpoint must be an `https` URL even in local development: `endpoint: 'http://localhost:8000'` makes the
+`takt()` snippet and the autowired `Takt` service throw an `InvalidArgumentException` when they are
+built, which breaks the page render. Serve your local collector over https, or point `endpoint` at an
+https origin.
+
 Autocapture is opt-in. `outbound`, `files`, `tagged` and `not_found` each add a
 token to the single `data-auto` attribute read by the bundled tracker;
 `file_extensions` narrows which downloads count.

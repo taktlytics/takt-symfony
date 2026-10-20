@@ -87,6 +87,22 @@ final class EndpointTest extends TestCase
         $this->assertStringNotContainsString('data-endpoint', $c->get(SnippetRenderer::class)->render());
     }
 
+    public function test_plain_http_endpoint_is_refused_by_the_server_client(): void
+    {
+        $c = $this->compile(['domain' => 'example.com', 'endpoint' => 'http://localhost:8000']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $c->get(Takt::class);
+    }
+
+    public function test_plain_http_endpoint_is_refused_by_the_snippet(): void
+    {
+        $c = $this->compile(['domain' => 'example.com', 'endpoint' => 'http://localhost:8000', 'mode' => 'cdn']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $c->get(SnippetRenderer::class);
+    }
+
     public function test_endpoint_from_an_env_placeholder_is_normalised_at_runtime(): void
     {
         // Le réglage peut être un %env()% : la normalisation doit donc avoir lieu
