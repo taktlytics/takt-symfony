@@ -19,7 +19,7 @@
 
 - `takt.endpoint` no longer means two different things depending on the code path.
   It fed both the browser snippet, which expects the full collect URL, and the
-  server-side sender, which expects an origin it appends `/api/event` to — so the
+  server-side sender, which expects an origin it appends `/api/event` to. So the
   shipped default (`https://taktlytics.com`) made the browser post to the service
   root, while the full URL form (`https://taktlytics.com/api/event`) made the
   server post to `/api/event/api/event`. Both forms are now normalised to whatever

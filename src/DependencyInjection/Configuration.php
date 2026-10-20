@@ -18,7 +18,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultValue('https://taktlytics.com')
                 ->end()
                 ->scalarNode('script_origin')
-                    ->info('First-party origin to serve the tracker + derive the endpoint from ({origin}/api/event) — your Takt domain or a custom domain you proxy through to dodge ad-blockers (endpoint wins over it).')
+                    ->info('First-party origin to serve the tracker + derive the endpoint from ({origin}/api/event): your Takt domain or a custom domain you proxy through to dodge ad-blockers (endpoint wins over it).')
                     ->defaultNull()
                 ->end()
                 ->scalarNode('api_key')->defaultNull()->end()
@@ -69,7 +69,7 @@ final class Configuration implements ConfigurationInterface
                     ->defaultFalse()
                 ->end()
                 ->scalarNode('scrub_url')
-                    ->info('Raw JS function to rewrite URLs before sending, e.g. "(u) => u.split(\'#\')[0]". Requires mode=sdk and is dev-controlled only — injected verbatim into the page; never build it from user input.')
+                    ->info('Raw JS function to rewrite URLs before sending, e.g. "(u) => u.split(\'#\')[0]". Requires mode=sdk and is dev-controlled only. Injected verbatim into the page; never build it from user input.')
                     ->defaultNull()
                 ->end()
             ->end();

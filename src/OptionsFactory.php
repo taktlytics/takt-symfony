@@ -8,8 +8,8 @@ final class OptionsFactory
 {
     /**
      * Construit les options du snippet. La normalisation de `endpoint` a lieu
-     * ici, à l'instanciation, pour que les valeurs issues d'un `%env()%` — non
-     * résolues à la compilation du conteneur — soient traitées elles aussi.
+     * ici, à l'instanciation, pour que les valeurs issues d'un `%env()%`, non
+     * résolues à la compilation du conteneur, soient traitées elles aussi.
      *
      * @param array<string,mixed> $config
      */
