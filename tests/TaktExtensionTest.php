@@ -37,8 +37,7 @@ final class TaktExtensionTest extends TestCase
         $html = $c->get(SnippetRenderer::class)->render();
         $this->assertInstanceOf(SnippetRenderer::class, $c->get(SnippetRenderer::class));
         $this->assertInstanceOf(Takt::class, $c->get(Takt::class));
-        // default mode is inline
-        $this->assertStringContainsString('var takt=', $html);
+        $this->assertStringContainsString("(function(){'use strict';", $html);
     }
 
     public function test_snippet_renderer_uses_domain(): void
@@ -51,8 +50,17 @@ final class TaktExtensionTest extends TestCase
     {
         $c = $this->compile(['domain' => 'example.com', 'mode' => 'inline']);
         $html = $c->get(SnippetRenderer::class)->render();
-        $this->assertStringContainsString('var takt=', $html);
+        $this->assertStringContainsString("(function(){'use strict';", $html);
         $this->assertStringNotContainsString(' src=', $html);
+    }
+
+    public function test_inline_bundle_does_not_reassign_global_takt(): void
+    {
+        $c = $this->compile(['domain' => 'example.com', 'mode' => 'inline']);
+        $html = $c->get(SnippetRenderer::class)->render();
+        $this->assertStringNotContainsString('var takt', $html);
+        $this->assertStringNotContainsString('})({})', $html);
+        $this->assertStringContainsString("(function(){'use strict';", $html);
     }
 
     public function test_cdn_mode_uses_jsdelivr(): void
