@@ -1,6 +1,6 @@
 # vskstudio/takt-symfony
 
-## Unreleased
+## 0.7.0
 
 ### Minor Changes
 
@@ -11,6 +11,7 @@
 - The route redaction documentation describes the constraint grammar, the
   REST segment and ambiguity limits, and the unusable-route masking of
   `takt-core-php`.
+- Requires `vskstudio/takt-core-php` 0.7.
 
 ## 0.6.0
 
