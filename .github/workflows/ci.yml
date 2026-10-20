@@ -44,6 +44,7 @@ jobs:
           composer global config --no-plugins allow-plugins.symfony/flex true
           composer global require --no-progress --no-scripts --no-plugins symfony/flex
       - run: composer update --no-interaction --no-progress
+      - run: composer audit
       - run: vendor/bin/phpunit
       - run: vendor/bin/phpstan analyse
       - run: vendor/bin/php-cs-fixer fix --dry-run --diff
