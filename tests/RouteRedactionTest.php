@@ -3,6 +3,7 @@
 namespace Vskstudio\Takt\Symfony\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -157,6 +158,31 @@ final class RouteRedactionTest extends TestCase
         $this->assertNull(self::defaultRouteOf($takt));
     }
 
+    public function test_server_client_receives_redact_undecodable_paths(): void
+    {
+        $c = self::compile(['domain' => 'example.com', 'redact_undecodable_paths' => false]);
+        $takt = $c->get(Takt::class);
+        $this->assertInstanceOf(Takt::class, $takt);
+
+        $this->assertFalse((new \ReflectionProperty($takt, 'redactUndecodablePaths'))->getValue($takt));
+    }
+
+    public function test_server_client_masks_undecodable_paths_by_default(): void
+    {
+        $c = self::compile(['domain' => 'example.com']);
+        $takt = $c->get(Takt::class);
+        $this->assertInstanceOf(Takt::class, $takt);
+
+        $this->assertTrue((new \ReflectionProperty($takt, 'redactUndecodablePaths'))->getValue($takt));
+    }
+
+    public function test_redact_undecodable_paths_must_be_a_boolean(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        self::compile(['domain' => 'example.com', 'redact_undecodable_paths' => 'false']);
+    }
+
     public function test_server_client_defaults_to_the_current_route_when_route_templates_is_on(): void
     {
         $c = self::compile(['domain' => 'example.com', 'route_templates' => true]);
@@ -164,6 +190,13 @@ final class RouteRedactionTest extends TestCase
         $this->assertInstanceOf(Takt::class, $takt);
 
         $this->assertSame('/verify/{token}', self::defaultRouteOf($takt));
+    }
+
+    public function test_takt_factory_masks_undecodable_paths_by_default(): void
+    {
+        $takt = TaktFactory::create('https://takt.example.com', 'example.com', null, new RequestStack());
+
+        $this->assertTrue((new \ReflectionProperty($takt, 'redactUndecodablePaths'))->getValue($takt));
     }
 
     public function test_takt_factory_stays_compatible_with_four_arguments(): void
