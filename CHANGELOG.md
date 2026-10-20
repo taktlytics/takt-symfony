@@ -11,16 +11,14 @@
   pageview was also sent with an empty URL, which the ingest rejects with a 400.
   Run `composer update vskstudio/takt-core-php`; no configuration change is
   needed. A regression test fails if the inline bundle reassigns the global again.
-- The inline snippet is checked against the bundle that `takt-core-php` 0.7
-  renders, so the test suite no longer asserts the old `var takt=` prefix.
 - Documents the `takt-core-php` 0.7 changes this bundle inherits, which 0.7.0
   did not list:
   - Endpoints must be `https`. A `http://` endpoint, `localhost` included,
     throws an `InvalidArgumentException` when the `Takt` service or the
     `takt()` snippet is built, so local development needs an https collector.
   - Route redaction masks a path that cannot be decoded as `/[redacted]` when a
-    route is configured (`redact_undecodable_paths: false` keeps the tolerant
-    matching of 0.6).
+    route is configured. `redact_undecodable_paths: false` matches such a path
+    like any other instead.
   - A constrained route parameter `{name<regex>}` is enforced: a value that does
     not match the regex no longer matches the route, and its path is sent as is.
   - In route template mode (`mode: sdk` with `redact_routes` or
